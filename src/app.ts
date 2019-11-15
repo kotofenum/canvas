@@ -47,7 +47,7 @@ export default class App {
   }
 
   private clearCanvas() {
-    this.context.fillStyle = "#222"
+    this.context.fillStyle = "#222";
     this.context.fillRect(
       0,
       0,

@@ -1,10 +1,13 @@
-const DEFAULT_RADIUS = 30
+const DEFAULT_RADIUS = 30;
+
+import Color from "./helpers/Color";
+import Hex from "./helpers/Hex";
 
 export default class Bubble implements IObject {
   x: number;
   y: number;
 
-  color: string;
+  color: Color;
 
   private startRadius: number;
   public radius: number;
@@ -13,15 +16,15 @@ export default class Bubble implements IObject {
   constructor(x: number, y: number, radius: number = DEFAULT_RADIUS) {
     this.x = x;
     this.y = y;
-    this.startRadius = radius ? radius : DEFAULT_RADIUS
-    this.radius = this.startRadius
+    this.startRadius = radius ? radius : DEFAULT_RADIUS;
+    this.radius = this.startRadius;
 
-    this.color = this.getRandomColorHex();
+    this.color = this.getRandomColor();
   }
 
   public update() {
     if (this.radius > 0.1) {
-      this.narrow()
+      this.narrow();
     } else {
       this.delete();
     }
@@ -33,7 +36,7 @@ export default class Bubble implements IObject {
 
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
-    ctx.strokeStyle = this.color;
+    ctx.strokeStyle = this.color.hex.string;
     ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
     ctx.stroke();
   }
@@ -42,23 +45,9 @@ export default class Bubble implements IObject {
     this.deleted = true;
   }
 
-  private getRandomColorHex(): string {
-    const red = Math.round(Math.random() * 255);
-    const green = Math.round(Math.random() * 255);
-    const blue = Math.round(Math.random() * 255);
+  private getRandomColor(): Color {
+    const value = Math.round(Math.random() * 0xffffff);
 
-    const color =
-      "#" + this.rgbToHex(red) + this.rgbToHex(green) + this.rgbToHex(blue);
-    return color;
-  }
-
-  private rgbToHex(val: number): string {
-    let hex: string = Number(val).toString(16);
-
-    if (hex.length < 2) {
-      hex = "0" + hex;
-    }
-
-    return hex;
+    return new Color(new Hex(value));
   }
 }

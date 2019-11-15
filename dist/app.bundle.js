@@ -556,7 +556,7 @@ eval("/* WEBPACK VAR INJECTION */(function(console) {var logLevel = \"info\";\n\
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst DEFAULT_RADIUS = 30;\nclass Bubble {\n    constructor(x, y, radius = DEFAULT_RADIUS) {\n        this.deleted = false;\n        this.x = x;\n        this.y = y;\n        this.startRadius = radius ? radius : DEFAULT_RADIUS;\n        this.radius = this.startRadius;\n        this.color = this.getRandomColorHex();\n    }\n    update() {\n        if (this.radius > 0.1) {\n            this.narrow();\n        }\n        else {\n            this.delete();\n        }\n    }\n    narrow() {\n        this.radius = this.radius * 0.95;\n    }\n    draw(ctx) {\n        ctx.beginPath();\n        ctx.strokeStyle = this.color;\n        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);\n        ctx.stroke();\n    }\n    delete() {\n        this.deleted = true;\n    }\n    getRandomColorHex() {\n        const red = Math.round(Math.random() * 255);\n        const green = Math.round(Math.random() * 255);\n        const blue = Math.round(Math.random() * 255);\n        const color = \"#\" + this.rgbToHex(red) + this.rgbToHex(green) + this.rgbToHex(blue);\n        return color;\n    }\n    rgbToHex(val) {\n        let hex = Number(val).toString(16);\n        if (hex.length < 2) {\n            hex = \"0\" + hex;\n        }\n        return hex;\n    }\n}\nexports.default = Bubble;\n\n\n//# sourceURL=webpack:///./src/Bubble.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst tslib_1 = __webpack_require__(/*! tslib */ \"./node_modules/tslib/tslib.es6.js\");\nconst DEFAULT_RADIUS = 30;\nconst Color_1 = tslib_1.__importDefault(__webpack_require__(/*! ./helpers/Color */ \"./src/helpers/Color.ts\"));\nconst Hex_1 = tslib_1.__importDefault(__webpack_require__(/*! ./helpers/Hex */ \"./src/helpers/Hex.ts\"));\nclass Bubble {\n    constructor(x, y, radius = DEFAULT_RADIUS) {\n        this.deleted = false;\n        this.x = x;\n        this.y = y;\n        this.startRadius = radius ? radius : DEFAULT_RADIUS;\n        this.radius = this.startRadius;\n        this.color = this.getRandomColor();\n    }\n    update() {\n        if (this.radius > 0.1) {\n            this.narrow();\n        }\n        else {\n            this.delete();\n        }\n    }\n    narrow() {\n        this.radius = this.radius * 0.95;\n    }\n    draw(ctx) {\n        ctx.beginPath();\n        ctx.strokeStyle = this.color.hex.string;\n        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);\n        ctx.stroke();\n    }\n    delete() {\n        this.deleted = true;\n    }\n    getRandomColor() {\n        const value = Math.round(Math.random() * 0xffffff);\n        return new Color_1.default(new Hex_1.default(value));\n    }\n}\nexports.default = Bubble;\n\n\n//# sourceURL=webpack:///./src/Bubble.ts?");
 
 /***/ }),
 
@@ -569,6 +569,42 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 
 "use strict";
 eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst tslib_1 = __webpack_require__(/*! tslib */ \"./node_modules/tslib/tslib.es6.js\");\nconst Bubble_1 = tslib_1.__importDefault(__webpack_require__(/*! ./Bubble */ \"./src/Bubble.ts\"));\nconst lodash_throttle_1 = tslib_1.__importDefault(__webpack_require__(/*! lodash.throttle */ \"./node_modules/lodash.throttle/index.js\"));\nclass App {\n    constructor(canvas) {\n        this.cb = lodash_throttle_1.default(obj => this.objects.push(obj), 20);\n        this.canvas = canvas;\n        this.context = canvas.getContext(\"2d\");\n        this.objects = [];\n    }\n    run() {\n        this.canvas.addEventListener(\"mousemove\", (event) => this.bubble(event));\n        this.canvas.addEventListener(\"click\", event => this.bubble(event, 300));\n        window.requestAnimationFrame(() => this.tick());\n    }\n    tick() {\n        this.update();\n        this.draw();\n        window.requestAnimationFrame(() => this.tick());\n    }\n    update() {\n        const toDelete = [];\n        this.objects.forEach(obj => {\n            obj.update();\n            if (obj.deleted)\n                toDelete.push(obj);\n        });\n        this.objects = this.objects.filter(obj => !toDelete.includes(obj));\n    }\n    draw() {\n        this.clearCanvas();\n        this.objects.forEach(obj => obj.draw(this.context));\n    }\n    clearCanvas() {\n        this.context.fillStyle = \"#222\";\n        this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height);\n    }\n    bubble(event, radius) {\n        const x = event.clientX;\n        const y = event.clientY;\n        const bubble = new Bubble_1.default(x, y, radius);\n        this.cb(bubble);\n    }\n}\nexports.default = App;\n\n\n//# sourceURL=webpack:///./src/app.ts?");
+
+/***/ }),
+
+/***/ "./src/helpers/Color.ts":
+/*!******************************!*\
+  !*** ./src/helpers/Color.ts ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("/* WEBPACK VAR INJECTION */(function(console) {\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst tslib_1 = __webpack_require__(/*! tslib */ \"./node_modules/tslib/tslib.es6.js\");\nconst RGB_1 = tslib_1.__importDefault(__webpack_require__(/*! ./RGB */ \"./src/helpers/RGB.ts\"));\nconst Hex_1 = tslib_1.__importDefault(__webpack_require__(/*! ./Hex */ \"./src/helpers/Hex.ts\"));\nclass Color {\n    constructor(value) {\n        if (value instanceof RGB_1.default) {\n            this.rgb = value;\n            this.hex = value.hex;\n        }\n        else if (value instanceof Hex_1.default) {\n            this.rgb = value.rgb;\n            this.hex = value;\n        }\n        else {\n            console.warn(\"Incorrect color value\");\n            this.rgb = new RGB_1.default(0, 0, 0);\n            this.hex = new Hex_1.default(0);\n        }\n    }\n}\nexports.default = Color;\n\n/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/console-browserify/index.js */ \"./node_modules/console-browserify/index.js\")))\n\n//# sourceURL=webpack:///./src/helpers/Color.ts?");
+
+/***/ }),
+
+/***/ "./src/helpers/Hex.ts":
+/*!****************************!*\
+  !*** ./src/helpers/Hex.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst tslib_1 = __webpack_require__(/*! tslib */ \"./node_modules/tslib/tslib.es6.js\");\nconst RGB_1 = tslib_1.__importDefault(__webpack_require__(/*! ./RGB */ \"./src/helpers/RGB.ts\"));\nclass Hex {\n    constructor(value) {\n        this.value = value;\n    }\n    get string() {\n        return \"#\" + this.value.toString(16);\n    }\n    get rgb() {\n        return new RGB_1.default((this.value >> 16) & 0xff, (this.value >> 8) & 0xff, this.value & 0xff);\n    }\n}\nexports.default = Hex;\n\n\n//# sourceURL=webpack:///./src/helpers/Hex.ts?");
+
+/***/ }),
+
+/***/ "./src/helpers/RGB.ts":
+/*!****************************!*\
+  !*** ./src/helpers/RGB.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst tslib_1 = __webpack_require__(/*! tslib */ \"./node_modules/tslib/tslib.es6.js\");\nconst Hex_1 = tslib_1.__importDefault(__webpack_require__(/*! ./Hex */ \"./src/helpers/Hex.ts\"));\nclass RGB {\n    constructor(r, g, b) {\n        this.r = r;\n        this.g = g;\n        this.b = b;\n    }\n    scheme() {\n        return {\n            r: this.r,\n            g: this.g,\n            b: this.b\n        };\n    }\n    get hex() {\n        return new Hex_1.default(this.number);\n    }\n    get number() {\n        return Number(this.r * 0x10000 + this.g * 0x100 + this.b);\n    }\n}\nexports.default = RGB;\n\n\n//# sourceURL=webpack:///./src/helpers/RGB.ts?");
 
 /***/ }),
 
