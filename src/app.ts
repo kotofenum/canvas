@@ -7,7 +7,7 @@ export default class App {
   private context: CanvasRenderingContext2D;
   private objects: IObject[];
 
-  private cb = _throttle((obj) => this.objects.push(obj), 20)
+  private cb = _throttle(obj => this.objects.push(obj), 20);
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -19,6 +19,7 @@ export default class App {
     this.canvas.addEventListener("mousemove", (event: MouseEvent) =>
       this.bubble(event)
     );
+    this.canvas.addEventListener("click", event => this.bubble(event, 300));
     window.requestAnimationFrame(() => this.tick());
   }
 
@@ -30,7 +31,14 @@ export default class App {
   }
 
   private update() {
-    this.objects.forEach(obj => obj.update());
+    const toDelete: IObject[] = [];
+
+    this.objects.forEach(obj => {
+      obj.update();
+      if (obj.deleted) toDelete.push(obj);
+    });
+
+    this.objects = this.objects.filter(obj => !toDelete.includes(obj));
   }
 
   private draw() {
@@ -39,7 +47,8 @@ export default class App {
   }
 
   private clearCanvas() {
-    this.context.clearRect(
+    this.context.fillStyle = "#222"
+    this.context.fillRect(
       0,
       0,
       this.context.canvas.width,
@@ -47,12 +56,12 @@ export default class App {
     );
   }
 
-  private bubble(event: MouseEvent) {
+  private bubble(event: MouseEvent, radius?: number) {
     const x = event.clientX;
     const y = event.clientY;
 
-    const bubble = new Bubble(x, y);
+    const bubble = new Bubble(x, y, radius);
 
-    this.cb(bubble)
+    this.cb(bubble);
   }
 }

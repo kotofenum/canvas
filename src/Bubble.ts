@@ -1,21 +1,26 @@
+const DEFAULT_RADIUS = 30
+
 export default class Bubble implements IObject {
   x: number;
   y: number;
 
   color: string;
 
-  public radius: number = 30;
+  private startRadius: number;
+  public radius: number;
   public deleted: Boolean = false;
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, radius: number = DEFAULT_RADIUS) {
     this.x = x;
     this.y = y;
+    this.startRadius = radius ? radius : DEFAULT_RADIUS
+    this.radius = this.startRadius
 
     this.color = this.getRandomColorHex();
   }
 
   public update() {
-    if (this.radius > 0) {
+    if (this.radius > 0.1) {
       this.narrow()
     } else {
       this.delete();
@@ -34,7 +39,6 @@ export default class Bubble implements IObject {
   }
 
   private delete() {
-    this.radius = 0;
     this.deleted = true;
   }
 
